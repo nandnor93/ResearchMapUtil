@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-
-#!/usr/bin/env python3
 import json
 import argparse
 import csv
@@ -64,7 +62,6 @@ def categorize(item):
     m = item.get('merge', {})
     langs = m.get('languages', [])
     invited = m.get('invited', False)
-    print(t)
     if t == 'presentations':
         if invited:
             return 'Invited Talk'
@@ -79,12 +76,6 @@ def categorize(item):
     return None
 
 def has_author(item, names, key):
-    # m = item.get('merge', {})
-    # for lang in ('ja', 'en'):
-    #     for a in m.get('authors', {}).get(lang, []):
-    #         if name in a.get('name', ''):
-    #             return True
-    # return False
     m = item.get('merge', {})
     for lang in ('ja', 'en'):
         for a in m.get(key, {}).get(lang, []):

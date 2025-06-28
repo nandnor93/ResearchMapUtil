@@ -30,10 +30,10 @@ def extract_title(item):
     # papers
     if 'paper_title' in m:
         # prefer English, fallback to Japanese
-        return (m['paper_title'].get('en').strip(), m['paper_title'].get('ja').strip())
+        return (m['paper_title'].get('en', '').strip(), m['paper_title'].get('ja', '').strip())
     # presentations
     if 'presentation_title' in m:
-        return (m['presentation_title'].get('en').strip(), m['presentation_title'].get('ja').strip())
+        return (m['presentation_title'].get('en', '').strip(), m['presentation_title'].get('ja', '').strip())
     return (None, None)
 
 def in_date_range(item, start_date=None, end_date=None):

@@ -99,6 +99,10 @@ if __name__ == "__main__":
                      help='Output filtered items as JSONL')
     grp.add_argument('--csv',   action='store_true',
                      help='Output as a single CSV')
+    grp.add_argument('--csv-jsps-papers',   action='store_true',
+                     help='Output as a single CSV compatible with JSPS KAKEN annual report (zassi.csv)')
+    grp.add_argument('--csv-jsps-conferences',   action='store_true',
+                     help='Output as a single CSV compatible with JSPS KAKEN annual report (gakkai.csv)')
     p.add_argument('--author', type=str, nargs='+', default=None,
                    help='Filter by author name (JA or EN)')
     p.add_argument('--dedupe', action='store_true',
@@ -188,6 +192,74 @@ if __name__ == "__main__":
                 start_page,
                 end_page
             ])
+
+    elif args.csv_jsps_papers or args.csv_jsps_conferences:
+        writer = csv.writer(args.output)
+        if args.csv_jsps_papers:
+            writer.writerow(['DOI','著者名','論文標題','雑誌名','巻','発行年','最初と最後の頁','査読の有無','国際共著','オープンアクセス'])
+        else:
+            # conferences
+            writer.writerow(['発表者名','発表標題','学会等名','発表年（開始）','発表年（終了）','招待講演','国際学会'])
+        for item in sorted(filtered, key=lambda it: extract_date(it) or ''):
+            m    = item['merge']
+            date = extract_date(item) or ''
+            cat  = categorize(item) or 'Other'
+            title_en, title_ja = extract_title(item)
+            auths = {'en': [], 'ja': []}
+            if cat == 'Academic Paper' and args.csv_jsps_papers:
+                key_authors = 'authors'
+            elif cat in {'International Presentation', 'Domestic Presentation', 'Invited Talk'} and args.csv_jsps_conferences:
+                key_authors = 'presenters'
+            else:
+                continue
+            for lang in ('en', 'ja'):
+                auths[lang].extend([a['name'] for a in m.get(key_authors, {}).get(lang,[])])
+            publication_name = (m.get('publication_name',{}).get('en')
+                     or m.get('publication_name',{}).get('ja')
+                     or m.get('event',{}).get('en')
+                     or m.get('event',{}).get('ja'))
+            
+            try:
+                doi = m['identifiers']['doi'][0]
+            except (KeyError, IndexError):
+                doi = ''
+
+            if args.csv_jsps_papers:
+                japanese = 'jpn' in m.get('languages', [])
+
+                volume        = m.get('volume', '') or ''
+                number        = m.get('number', '') or ''
+                start_page    = m.get('starting_page', '') or m.get('start_page', '') or ''
+                end_page      = m.get('ending_page', '') or m.get('end_page', '') or ''
+                writer.writerow([
+                    doi,
+                    ", ".join(auths['ja'] if japanese else auths['en']),
+                    title_ja if japanese else title_en,
+                    publication_name,
+                    volume,
+                    number,
+                    start_page,
+                    end_page,
+                    '',
+                    '',
+                    ''
+                ])
+            else:
+                # conferences
+                from_date = m.get('from_event_date', '')
+                to_date   = m.get('to_event_date', '')
+                invited   = '1' if m.get('invited', False) else '0'
+                international = '1' if 'eng' in m.get('languages', []) else '0'
+                japanese = 'jpn' in m.get('languages', [])
+                writer.writerow([
+                    ", ".join(auths['ja'] if japanese else auths['en']),
+                    title_ja if japanese else title_en,
+                    publication_name,
+                    from_date[:4] if from_date else '',
+                    to_date[:4] if to_date else '',
+                    invited,
+                    international
+                ])
 
     else:
         print(json.dumps(filtered, ensure_ascii=False, indent=2),

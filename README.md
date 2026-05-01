@@ -9,6 +9,7 @@
 このスクリプトは、ResearchMap形式のJSONLファイルを読み込み、以下の形式で出力します。
 - JSONL（1行1オブジェクト）
 - カテゴリ分け済みCSV
+- JSPS科研費 年次報告用CSV
 
 研究業績データ（発表、論文、受賞など）を簡単に集約・分類・CSV化できます。また、ソート、重複除去、著者フィルターも可能です。
 
@@ -40,7 +41,10 @@
 | `--dedupe`                    | 同一日付＋タイトルの重複アイテムを一度だけ出力 |
 | `--jsonl`                     | JSONL形式で出力              |
 | `--csv`                       | カテゴリ分けCSVとして出力          |
+| `--csv-jsps-papers`           | JSPS年次報告の学術論文用CSVで出力 ※査読有無・国際共著は手動で記載 |
+| `--csv-jsps-conferences`      | JSPS年次報告の国内・国際用CSVで出力 |
 | `--output, -o FILE`           | 出力先ファイル（デフォルト: stdout）  |
+
 
 #### CSV出力カラム（`--csv` 時）
 
@@ -66,6 +70,10 @@ Volume, Number, Start Page, End Page
    ```bash
    ./researchmap_util.py --author "Hokkai M." "北海 道大" --dedupe --jsonl a.jsonl b.jsonl > filtered.jsonl
    ```
+4. 特定著者の特定年度のJSPS年次報告CSV
+   ```bash
+   ./researchmap_util.py --start-date 2025-04-01 --end-date 2026-03-31 --csv-jsps-paper data.json -o hokkai-2025-kiban.csv --author "Hokkai M." "北海 道大" "Hokudai H." "北大 花子"
+   ```
 
 ---
 
@@ -77,6 +85,7 @@ This script ingests one or more ResearchMap-format JSONL files and outputs:
 
 * JSONL (one object per line)
 * A categorized CSV
+* A formatted CSV for JSPS KAKEN annual reports
 
 It streamlines aggregation, classification, and CSV export of research achievements (presentations, papers, awards, etc.).
 
@@ -111,6 +120,8 @@ It streamlines aggregation, classification, and CSV export of research achieveme
 | `--dedupe`                    | Remove duplicates with identical date+title |
 | `--jsonl`                     | Output as JSONL                             |
 | `--csv`                       | Output as categorized CSV                   |
+| `--csv-jsps-papers`           | Output as JSPS annual report CSV for academic papers \*peer review and intl. co-authorship must be filled manually |
+| `--csv-jsps-conferences`      | Output as JSPS annual report CSV for domestic/international conferences |
 | `--output, -o FILE`           | Output file (default: stdout)               |
 
 #### CSV Columns (`--csv`)
@@ -137,4 +148,7 @@ Volume, Number, Start Page, End Page
    ```bash
    ./researchmap_util.py --author "Hokkai M." "北海 道大" --dedupe --jsonl a.jsonl b.jsonl > filtered.jsonl
    ```
-
+4. JSPS annual report CSV for a specific author and fiscal year:  
+   ```bash
+   ./researchmap_util.py --start-date 2025-04-01 --end-date 2026-03-31 --csv-jsps-paper data.json -o hokkai-2025-kiban.csv --author "Hokkai M." "北海 道大" "Hokudai H." "北大 花子"
+   ```

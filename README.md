@@ -1,4 +1,4 @@
-# ResearchMap JSONL to CSV Converter
+# ResearchMap JSON (JSONL) to CSV Converter
 
 ほぼ完全にChatGPT製。READMEも含めて。
 
@@ -6,20 +6,24 @@
 ## 📄 README — 日本語版
 
 ### 概要
-このスクリプトは、ResearchMap形式のJSONLファイルを読み込み、以下の形式で出力します。
+このスクリプトは、ResearchMap形式の JSON (JSONL) ファイルを読み込み、以下の形式で出力します。
 - JSONL（1行1オブジェクト）
 - カテゴリ分け済みCSV
-- JSPS科研費 年次報告用CSV
+- JSPS科研費 年次報告用CSV 論文用・学会用
 
 研究業績データ（発表、論文、受賞など）を簡単に集約・分類・CSV化できます。また、ソート、重複除去、著者フィルターも可能です。
 
 ### 特長
 - 複数ファイルのマージ
-- 日付（YYYY-MM-DD）    による範囲指定フィルタ
+- 日付（YYYY-MM-DD）による範囲指定フィルタ
 - 著者（日本語／英語名）によるフィルタ（複数指定可）
 - 重複（同日付＋同タイトル）の除去オプション
-- カテゴリ分け（国内発表／国際発表／招待講演／論文／受賞）
-- 英日両タイトル＆著者名を列分け
+- CSV出力
+    - カテゴリ分け（国内発表／国際発表／招待講演／論文／受賞）
+    - 英日両タイトル＆著者名を列分け
+- JSPS年次報告フォーマットCSV出力
+    - 学会・論文フォーマットそれぞれ対応
+
 
 ### 要件
 - Python 3.7 以上
@@ -64,7 +68,7 @@ Volume, Number, Start Page, End Page
    ```
 2. 2024年度以降の国際発表のみ CSV 出力  
    ```bash
-   ./researchmap_util.py --start-date 2024-04-01 --csv data.jsonl > intl_presentations.csv
+   ./researchmap_util.py --start-date 2024-04-01 --csv data.jsonl | grep 'International Presentation' > intl_presentations.csv
    ```
 3. 特定著者の成果を重複除去して JSONL 化  
    ```bash
@@ -95,8 +99,11 @@ It streamlines aggregation, classification, and CSV export of research achieveme
 * Date-range filtering (`YYYY-MM-DD`    )
 * Author filtering (Japanese/English names, multiple)
 * Duplicate removal by date+title
-* Category assignment (Domestic Presentation / International Presentation / Invited Talk / Academic Paper / Award)
-* CSV fields for `volume`, `number`, `starting_page`, `ending_page`
+* CSV export
+   * Category assignment (Domestic Presentation / International Presentation / Invited Talk / Academic Paper / Award)
+   * CSV fields for `volume`, `number`, `starting_page`, `ending_page`
+* JSPS annual report format
+   * CSV formats for papers and conferences
 
 ### Requirements
 
@@ -142,7 +149,7 @@ Volume, Number, Start Page, End Page
    ```
 2. Export international presentations since 2024 as CSV:  
    ```bash
-   ./researchmap_util.py --start-date 2024-01 --csv data.jsonl > intl_presentations.csv
+   ./researchmap_util.py --start-date 2024-04-01 --csv data.jsonl | grep 'International Presentation' > intl_presentations.csv
    ```
 3. Filter for a specific author, remove duplicates, and output JSONL:  
    ```bash
